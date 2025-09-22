@@ -1,0 +1,545 @@
+/* モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-4);
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.15s ease-out;
+}
+
+.modal-header {
+    padding: var(--spacing-5) var(--spacing-6);
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--gray-50);
+}
+
+.modal-header h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--border-radius);
+    background: transparent;
+    color: var(--gray-500);
+    font-size: var(--text-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.modal-body {
+    padding: var(--spacing-6);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    padding: var(--spacing-5) var(--spacing-6);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+    background: var(--gray-50);
+}
+
+/* ローディングオーバーレイ */
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 2000;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.loading-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-content {
+    text-align: center;
+    color: var(--gray-700);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--primary-500);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto var(--spacing-4);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* トーストメッセージ */
+.toast-container {
+    position: fixed;
+    top: var(--spacing-6);
+    right: var(--spacing-6);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    max-width: 400px;
+}
+
+.toast {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-4) var(--spacing-5);
+    border-left: 4px solid var(--primary-500);
+    animation: slideInRight 0.3s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast.success {
+    border-left-color: var(--success-500);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-500);
+}
+
+.toast.error {
+    border-left-color: var(--danger-500);
+}
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-2);
+}
+
+.toast-title {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.toast-close {
+    background: transparent;
+    color: var(--gray-400);
+    font-size: var(--text-sm);
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-close:hover {
+    color: var(--gray-600);
+}
+
+.toast-message {
+    color: var(--gray-600);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--primary-500);
+    animation: progressBar 5s linear forwards;
+}
+
+.toast.success .toast-progress {
+    background: var(--success-500);
+}
+
+.toast.warning .toast-progress {
+    background: var(--warning-500);
+}
+
+.toast.error .toast-progress {
+    background: var(--danger-500);
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        transform: scale(0.95) translateY(-10px);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes progressBar {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+    .header-content {
+        padding: var(--spacing-3) var(--spacing-4);
+    }
+
+    .app-title {
+        font-size: var(--text-lg);
+    }
+
+    .nav-content {
+        padding: 0 var(--spacing-4);
+        overflow-x: auto;
+    }
+
+    .nav-item {
+        padding: var(--spacing-3) var(--spacing-4);
+        white-space: nowrap;
+    }
+
+    .app-main {
+        padding: var(--spacing-6) var(--spacing-4);
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-4);
+    }
+
+    .section-actions {
+        width: 100%;
+    }
+
+    .grading-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: var(--spacing-4);
+    }
+
+    .problem-area {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .answer-area {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .result-area {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .answer-actions {
+        flex-direction: column;
+        gap: var(--spacing-3);
+    }
+
+    .answer-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .feedback-section {
+        grid-template-columns: 1fr;
+    }
+
+    .score-options {
+        justify-content: space-around;
+    }
+
+    .problem-meta {
+        flex-direction: column;
+        gap: var(--spacing-3);
+    }
+
+    .problem-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-3);
+    }
+
+    .problem-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .history-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .history-filters .select,
+    .history-filters .input {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .history-scores {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-2);
+    }
+
+    .history-meta {
+        flex-direction: column;
+        gap: var(--spacing-2);
+    }
+
+    .modal-content {
+        max-width: 90vw;
+        margin: var(--spacing-4);
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: var(--spacing-4);
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .toast-container {
+        top: var(--spacing-4);
+        right: var(--spacing-4);
+        left: var(--spacing-4);
+        max-width: none;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: var(--spacing-2);
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-title {
+        font-size: var(--text-base);
+    }
+
+    .app-title i {
+        display: none;
+    }
+
+    .header-right {
+        gap: var(--spacing-2);
+    }
+
+    .btn {
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: var(--text-xs);
+    }
+
+    .card-header,
+    .card-content {
+        padding: var(--spacing-4);
+    }
+
+    .problem-meta {
+        padding: var(--spacing-3);
+    }
+
+    .score-badge {
+        width: 50px !important;
+        height: 50px !important;
+        font-size: var(--text-lg) !important;
+    }
+
+    .radio-label .score-badge {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: var(--text-base) !important;
+    }
+}
+
+/* 印刷スタイル */
+@media print {
+    .app-header,
+    .app-nav,
+    .app-footer,
+    .modal,
+    .loading-overlay,
+    .toast-container,
+    .btn,
+    .section-actions {
+        display: none !important;
+    }
+
+    .app-main {
+        padding: 0;
+        max-width: none;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+
+    .grading-container {
+        display: block;
+    }
+
+    .problem-area,
+    .answer-area,
+    .result-area {
+        margin-bottom: 20px;
+    }
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-800: #f9fafb;
+        --gray-900: #ffffff;
+    }
+
+    body {
+        background-color: var(--gray-900);
+        color: var(--gray-100);
+    }
+
+    .card,
+    .modal-content,
+    .toast {
+        background: var(--gray-800);
+        border-color: var(--gray-700);
+    }
+
+    .input,
+    .textarea,
+    .select {
+        background: var(--gray-700);
+        border-color: var(--gray-600);
+        color: var(--gray-100);
+    }
+
+    .input:focus,
+    .textarea:focus,
+    .select:focus {
+        border-color: var(--primary-400);
+    }
+}
+
+/* 高コントラストモード対応 */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-500: #0066cc;
+        --success-500: #008800;
+        --warning-500: #cc6600;
+        --danger-500: #cc0000;
+    }
+
+    .btn {
+        border-width: 2px;
+    }
+
+    .card,
+    .modal-content {
+        border-width: 2px;
+    }
+}
+
+/* 動きを減らす設定 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .status-indicator .fas.fa-circle {
+        animation: none;
+    }
+
+    .spinner {
+        animation: none;
+        border-top-color: var(--primary-500);
+        border-right-color: var(--primary-500);
+    }
+}

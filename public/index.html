@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA PM試験 AI一次採点システム</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- アイコンフォント -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+</head>
+<body>
+    <!-- メインアプリケーション -->
+    <div id="app" class="app-container">
+        <!-- ヘッダー -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="app-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        IPA PM試験 AI一次採点システム
+                    </h1>
+                </div>
+                <div class="header-right">
+                    <button id="export-btn" class="btn btn-outline">
+                        <i class="fas fa-download"></i>
+                        エクスポート
+                    </button>
+                    <button id="settings-btn" class="btn btn-ghost">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ナビゲーション -->
+        <nav class="app-nav">
+            <div class="nav-content">
+                <button id="nav-grading" class="nav-item active">
+                    <i class="fas fa-edit"></i>
+                    採点
+                </button>
+                <button id="nav-problems" class="nav-item">
+                    <i class="fas fa-list-alt"></i>
+                    問題管理
+                </button>
+                <button id="nav-history" class="nav-item">
+                    <i class="fas fa-history"></i>
+                    採点履歴
+                </button>
+            </div>
+        </nav>
+
+        <!-- メインコンテンツ -->
+        <main class="app-main">
+            <!-- 採点画面 -->
+            <section id="grading-section" class="section active">
+                <div class="section-header">
+                    <h2>採点</h2>
+                    <div class="section-actions">
+                        <select id="problem-selector" class="select">
+                            <option value="">問題を選択してください</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grading-container">
+                    <!-- 問題表示エリア -->
+                    <div class="problem-area">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>問題情報</h3>
+                            </div>
+                            <div class="card-content">
+                                <div id="problem-info" class="problem-info">
+                                    <p class="text-muted">問題を選択してください</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 解答入力エリア -->
+                    <div class="answer-area">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>受験者解答</h3>
+                                <div class="char-counter">
+                                    <span id="char-count">0</span> 文字
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <textarea
+                                    id="student-answer"
+                                    class="textarea"
+                                    placeholder="受験者の解答を入力してください..."
+                                    rows="10"
+                                ></textarea>
+                                <div class="answer-actions">
+                                    <button id="clear-answer" class="btn btn-ghost">
+                                        <i class="fas fa-trash"></i>
+                                        クリア
+                                    </button>
+                                    <button id="grade-answer" class="btn btn-primary">
+                                        <i class="fas fa-robot"></i>
+                                        AI採点実行
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 採点結果エリア -->
+                    <div class="result-area">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>採点結果</h3>
+                            </div>
+                            <div class="card-content">
+                                <div id="grading-result" class="grading-result">
+                                    <p class="text-muted">採点を実行してください</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 最終評価エリア -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>最終評価</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="final-evaluation">
+                                    <div class="score-selection">
+                                        <label>最終スコア:</label>
+                                        <div class="score-options">
+                                            <label class="radio-label">
+                                                <input type="radio" name="final-score" value="〇">
+                                                <span class="score-badge score-excellent">〇</span>
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="final-score" value="△">
+                                                <span class="score-badge score-good">△</span>
+                                            </label>
+                                            <label class="radio-label">
+                                                <input type="radio" name="final-score" value="✕">
+                                                <span class="score-badge score-poor">✕</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="comment-section">
+                                        <label for="final-comment">コメント:</label>
+                                        <textarea
+                                            id="final-comment"
+                                            class="textarea"
+                                            placeholder="評価コメントを入力してください..."
+                                            rows="3"
+                                        ></textarea>
+                                    </div>
+                                    <button id="save-evaluation" class="btn btn-success">
+                                        <i class="fas fa-save"></i>
+                                        評価を保存
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 問題管理画面 -->
+            <section id="problems-section" class="section">
+                <div class="section-header">
+                    <h2>問題管理</h2>
+                    <button id="add-problem" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        問題追加
+                    </button>
+                </div>
+
+                <div class="problems-container">
+                    <div id="problems-list" class="problems-list">
+                        <!-- 問題リストがここに表示される -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 採点履歴画面 -->
+            <section id="history-section" class="section">
+                <div class="section-header">
+                    <h2>採点履歴</h2>
+                    <div class="history-filters">
+                        <select id="filter-year" class="select">
+                            <option value="">全年度</option>
+                        </select>
+                        <select id="filter-score" class="select">
+                            <option value="">全スコア</option>
+                            <option value="〇">〇</option>
+                            <option value="△">△</option>
+                            <option value="✕">✕</option>
+                        </select>
+                        <input type="text" id="filter-search" class="input" placeholder="検索...">
+                    </div>
+                </div>
+
+                <div class="history-container">
+                    <div id="history-list" class="history-list">
+                        <!-- 履歴リストがここに表示される -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- フッター -->
+        <footer class="app-footer">
+            <div class="footer-content">
+                <p>&copy; 2024 IPA PM試験 AI一次採点システム MVP</p>
+                <div class="footer-links">
+                    <span class="status-indicator">
+                        <i class="fas fa-circle"></i>
+                        <span id="connection-status">接続中...</span>
+                    </span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- モーダル類 -->
+    <!-- 問題追加モーダル -->
+    <div id="problem-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>問題追加</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="problem-form">
+                    <div class="form-group">
+                        <label for="problem-year">年度:</label>
+                        <input type="text" id="problem-year" class="input" placeholder="令和5年度">
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-question_group">問題群:</label>
+                        <input type="text" id="problem-question_group" class="input" placeholder="午後I 問2">
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-question_number">設問:</label>
+                        <input type="text" id="problem-question_number" class="input" placeholder="設問1">
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-context">問題文:</label>
+                        <textarea id="problem-context" class="textarea" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-prompt">設問:</label>
+                        <textarea id="problem-prompt" class="textarea" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-model_answer">模範解答:</label>
+                        <textarea id="problem-model_answer" class="textarea" rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-intent">出題趣旨:</label>
+                        <textarea id="problem-intent" class="textarea" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="problem-char-limit">文字数制限:</label>
+                        <input type="number" id="problem-char-limit" class="input" placeholder="40">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-problem" class="btn btn-ghost">キャンセル</button>
+                <button id="save-problem" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- エクスポートモーダル -->
+    <div id="export-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>データエクスポート</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <div class="form-group">
+                        <label>エクスポート形式:</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="export-format" value="csv" checked>
+                                CSV形式
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="export-format" value="jsonl">
+                                JSONL形式
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="anonymize-data">
+                            個人情報の匿名化
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancel-export" class="btn btn-ghost">キャンセル</button>
+                <button id="execute-export" class="btn btn-primary">エクスポート</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ローディングオーバーレイ -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>AI採点中...</p>
+        </div>
+    </div>
+
+    <!-- トーストメッセージ -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JavaScript -->
+    <script src="js/utils.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/rules.js"></script>
+    <script src="js/grading.js"></script>
+    <script src="js/problems.js"></script>
+    <script src="js/history.js"></script>
+    <script src="js/export.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
