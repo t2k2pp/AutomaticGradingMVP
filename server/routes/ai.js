@@ -2,6 +2,100 @@ const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
 
+// LLMプロバイダー選択と設定
+function getLLMConfig() {
+  const provider = process.env.LLM_PROVIDER || 'lmstudio';
+
+  switch (provider) {
+    case 'ollama':
+      return {
+        provider: 'ollama',
+        apiUrl: process.env.OLLAMA_API_URL || 'http://127.0.0.1:11434',
+        model: process.env.OLLAMA_MODEL || 'llama2:7b',
+        endpoint: '/api/generate'
+      };
+    case 'lmstudio':
+    default:
+      return {
+        provider: 'lmstudio',
+        apiUrl: process.env.LMSTUDIO_API_URL || process.env.AI_API_URL || 'http://127.0.0.1:1234',
+        apiKey: process.env.LMSTUDIO_API_KEY || process.env.AI_API_KEY || 'dummy-key',
+        model: 'gpt-4o-mini',
+        endpoint: '/v1/chat/completions'
+      };
+  }
+}
+
+// Ollama用のリクエスト作成
+function createOllamaRequest(prompt, model) {
+  return {
+    model: model,
+    prompt: prompt,
+    stream: false,
+    options: {
+      temperature: 0.1,
+      num_predict: 1000
+    }
+  };
+}
+
+// LM Studio用のリクエスト作成
+function createLMStudioRequest(prompt, model) {
+  return {
+    model: model,
+    messages: [
+      {
+        role: 'user',
+        content: prompt
+      }
+    ],
+    temperature: 0.1,
+    max_tokens: 1000,
+    response_format: { type: 'json_object' }
+  };
+}
+
+// AI APIコール統一関数
+async function callAI(prompt) {
+  const config = getLLMConfig();
+
+  let requestBody, headers, endpoint;
+
+  if (config.provider === 'ollama') {
+    requestBody = createOllamaRequest(prompt, config.model);
+    headers = {
+      'Content-Type': 'application/json'
+    };
+    endpoint = `${config.apiUrl}${config.endpoint}`;
+  } else {
+    requestBody = createLMStudioRequest(prompt, config.model);
+    headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.apiKey}`
+    };
+    endpoint = `${config.apiUrl}${config.endpoint}`;
+  }
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(requestBody)
+  });
+
+  if (!response.ok) {
+    throw new Error(`${config.provider} API Error: ${response.status} ${response.statusText}`);
+  }
+
+  const aiResponse = await response.json();
+
+  // レスポンス形式の正規化
+  if (config.provider === 'ollama') {
+    return aiResponse.response; // Ollamaは直接テキストを返す
+  } else {
+    return aiResponse.choices[0]?.message?.content; // LM Studioはchoices形式
+  }
+}
+
 // AI採点エンドポイント
 router.post('/grade', async (req, res) => {
   const startTime = Date.now();
@@ -34,37 +128,8 @@ router.post('/grade', async (req, res) => {
       student_answer
     });
 
-    // AI APIリクエストパラメータ
-    const aiRequestBody = {
-      model: 'gpt-4o-mini', // ローカルLLMのモデル名に応じて調整
-      messages: [
-        {
-          role: 'user',
-          content: gradingPrompt
-        }
-      ],
-      temperature: 0.1,
-      max_tokens: 1000,
-      response_format: { type: 'json_object' }
-    };
-
-    // AI APIへのリクエスト
-    const aiApiUrl = process.env.AI_API_URL || 'http://127.0.0.1:1234';
-    const response = await fetch(`${aiApiUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.AI_API_KEY || 'dummy-key'}`
-      },
-      body: JSON.stringify(aiRequestBody)
-    });
-
-    if (!response.ok) {
-      throw new Error(`AI API Error: ${response.status} ${response.statusText}`);
-    }
-
-    const aiResponse = await response.json();
-    const content = aiResponse.choices[0]?.message?.content;
+    // AI APIコール（プロバイダー自動選択）
+    const content = await callAI(gradingPrompt);
 
     if (!content) {
       throw new Error('AI APIからの応答が空です');
